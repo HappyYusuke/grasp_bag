@@ -58,17 +58,26 @@ class ScanDataSensing(Node):
         self.scan_custom_data = local_scan_data
         self.scan_params()
 
-    def graph_data_generate(self):
-        for i in range(len(self.scan_custom_data)):
+    def graph_data_generate(self, scan_data):
+        for i in range(len(scan_data)):
             self.scan_index_list.append(i)
         #print(scan_index_list)
 
-    def graph_plot(self, deg=360):
-        self.scan_check()
-        self.scan_range_set(deg)
-        self.graph_data_generate()
+    def graph_plot(self, deg=360, scan_data=None, estimate_result=None):
+        if scan_data is None:
+            self.scan_range_set(deg)
+            scan_data = self.scan_custom_data
+        else:
+            pass
+        self.graph_data_generate(scan_data)
         self.get_logger().info("Plotting scan data")
-        plt.plot(self.scan_index_list, list(reversed(self.scan_custom_data)))
+        plt.plot(self.scan_index_list, scan_data)
+        if estimate_result is not None:
+            plt.vlines(estimate_result['bag_range'][0], 0, 4, color='red', linestyles='dotted')
+            plt.vlines(estimate_result['bag_range'][-1], 0, 4, color='red', linestyles='dotted')
+            plt.vlines(estimate_result['bag_center'], 0, 4, color='green', linestyles='dotted')
+        else:
+            pass
         plt.show()
 
 

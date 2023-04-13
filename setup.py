@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'scan_data_sensing_node = grasp_bag.scan_data_sensing_node:main',
-            'bag_localization_node = grasp_bag.bag_localization_node:main'
+            'bag_localization_node = grasp_bag.bag_localization_node:main',
+            'grasp_bag_server = grasp_bag.grasp_bag_server:main'
         ],
     },
 )
