@@ -31,17 +31,22 @@ class ScanDataSensing(Node):
         return int(value + 1) if decimals >= 0.5 else int(value)
 
     def scan_check(self):
+        self.scan_data.clear()
         while not self.scan_data and rclpy.ok():
+            rclpy.spin_once(self)
             self.get_logger().info("No scan data ...")
             time.sleep(0.7)
         self.get_logger().info("Scan data is available !")
 
+    def scan_distance_get(self, index):
+        self.scan_check()
+
     def scan_params(self):
         scan_index_sum = len(self.scan_custom_data)
-        self.scan_custom_center = self.round_half_up(scan_index_sum/2 - 1)
-        print(f"Number of scan data >>> {scan_index_sum}")
-        print(f"Center of scan index >>> {self.scan_custom_center}")
-        print(f"Degree per step >>> {self.scan_increment}")
+        self.scan_custom_center = self.round_half_up(scan_index_sum/2)
+        self.get_logger().info(f"Number of scan data >>> {scan_index_sum}")
+        self.get_logger().info(f"Center of scan index >>> {self.scan_custom_center}")
+        self.get_logger().info(f"Degree per step >>> {self.scan_increment}")
 
     def scan_range_set(self, deg):
         self.scan_check()
@@ -61,7 +66,6 @@ class ScanDataSensing(Node):
     def graph_data_generate(self, scan_data):
         for i in range(len(scan_data)):
             self.scan_index_list.append(i)
-        #print(scan_index_list)
 
     def graph_plot(self, deg=360, scan_data=None, estimate_result=None):
         if scan_data is None:
@@ -79,18 +83,18 @@ class ScanDataSensing(Node):
         else:
             pass
         plt.show()
+        #if plt.waitforbuttonpress():
+        #    plt.close()
 
 
 def main():
     rclpy.init()
     sds_node = ScanDataSensing()
     try:
-        thread = threading.Thread(target=rclpy.spin, args=(sds_node, ), daemon=True)
-        thread.start()
         time.sleep(0.1)
-        sds_node.graph_plot(360)
+        sds_node.graph_plot(180)
     except KeyboardInterrupt:
         pass
-    thread.join()
+    #thread.join()
     sds_node.destroy_node()
     rclpy.shutdown()
