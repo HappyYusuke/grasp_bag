@@ -22,7 +22,7 @@ class BagLocalizationServer(Node):
         # Module
         self.sds_node = ScanDataSensing()
         self.get_logger().info("Ready to set bag_localization_server")
-        
+
     def average(self, input_list):
         return sum(input_list)/len(input_list)
 

@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
 import math
 import time
@@ -11,7 +12,7 @@ class ScanDataSensing(Node):
     def __init__(self):
         super().__init__('scan_data_sensing_node')
         # Subscriber
-        self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
+        self.create_subscription(LaserScan, '/scan', self.scan_callback, qos_profile_sensor_data)
         # Value
         self.scan_data = []
         self.scan_index_list = []
@@ -38,9 +39,6 @@ class ScanDataSensing(Node):
             time.sleep(0.7)
         self.get_logger().info("Scan data is available !")
 
-    def scan_distance_get(self, index):
-        self.scan_check()
-
     def scan_params(self):
         scan_index_sum = len(self.scan_custom_data)
         self.scan_custom_center = self.round_half_up(scan_index_sum/2)
@@ -60,8 +58,17 @@ class ScanDataSensing(Node):
         del local_scan_data[0 : max_index + 1]
         local_scan_data.extend(tmp_list)
         # インスタンス変数に格納
-        self.scan_custom_data = local_scan_data
+        self.scan_custom_data = self.scan_zero_change(local_scan_data)
         self.scan_params()
+
+    def scan_zero_change(self, in_zero_list):
+        changed_list = []
+        for value in in_zero_list:
+            if value == 0.0:
+                changed_list.append(99.9)
+            else:
+                changed_list.append(value)
+        return changed_list
 
     def graph_data_generate(self, scan_data):
         for i in range(len(scan_data)):
